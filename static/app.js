@@ -1,52 +1,48 @@
-const record = document.querySelector(".record");
 const output = document.querySelector(".output");
 
 if (navigator.mediaDevices.getUserMedia) {
-    
-    let onMediaSetupSuccess = function (stream) {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
         const mediaRecorder = new MediaRecorder(stream);
         let chunks = [];
 
-        record.onclick = function() {
-            if (mediaRecorder.state == "recording") {
-                mediaRecorder.stop();
-                record.classList.remove("btn-danger");
-                record.classList.add("btn-primary");
-            } else {
-                mediaRecorder.start();
-                record.classList.remove("btn-primary");
-                record.classList.add("btn-danger");
-            }
-        }
-
         mediaRecorder.ondataavailable = function (e) {
             chunks.push(e.data);
-        }
+        };
 
         mediaRecorder.onstop = function () {
-            let blob = new Blob(chunks, {type: "audio/webm"});
+            const blob = new Blob(chunks, { type: "audio/webm" });
             chunks = [];
 
-            let formData = new FormData();
+            const formData = new FormData();
             formData.append("audio", blob);
 
             fetch("/transcribe", {
                 method: "POST",
                 body: formData
-            }).then((response) => response.json())
-            .then((data) => {
-                output.innerHTML = data.output;
             })
+            .then((response) => response.json())
+            .then((data) => {
+                output.innerHTML += `<p>${data.output}</p>`;
+            });
+        };
+
+        // Función para grabar 5 segundos automáticamente
+        function recordFor5Seconds() {
+            if (mediaRecorder.state === "inactive") {
+                mediaRecorder.start();
+
+                setTimeout(() => {
+                    mediaRecorder.stop();
+                }, 5000); // 5 segundos
+            }
         }
-    }
 
-    let onMediaSetupFailure = function(err) {
-        alert(err);
-    }   
+        // Repetir grabación cada 5 segundos
+        setInterval(recordFor5Seconds, 5000);
 
-    navigator.mediaDevices.getUserMedia({ audio: true}).then(onMediaSetupSuccess, onMediaSetupFailure);
-
+    }).catch(function (err) {
+        alert("Error al acceder al micrófono: " + err);
+    });
 } else {
-    alert("getUserMedia is not supported in your browser!")
+    alert("getUserMedia no es compatible con tu navegador.");
 }
-
