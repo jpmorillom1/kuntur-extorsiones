@@ -1,38 +1,88 @@
 import io
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response
 from faster_whisper import WhisperModel
+import threading
+import queue
+import time
+import uuid
+from datetime import datetime
+import json
 
-# Cargar el modelo una vez al iniciar la aplicación
+# Nueva variable global para guardar detalles
+eventos_detectados = []  # cada elemento será un dict con id, texto y timestamp
+
+
+
+
+app = Flask(__name__)
 whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
 
-def create_app():
-    app = Flask(__name__)
+# Palabras clave para alerta
+PALABRAS_CLAVE = {"extorsión", "arma", "matar", "dinero", "amenaza"}
 
-    @app.route("/")
-    def index():
-        return render_template("index.html")
+# Cola de eventos SSE
+event_queue = queue.Queue()
 
-    @app.route("/transcribe", methods=["POST"])
-    def transcribe():
-        file = request.files["audio"]
-        buffer = io.BytesIO(file.read())
-        
-        # Guardar el audio en un archivo temporal (Faster Whisper trabaja con archivos)
-        temp_path = "temp_audio.webm"
-        with open(temp_path, "wb") as f:
-            f.write(buffer.getbuffer())
-        
-        # Realizar la transcripción
-        segments, info = whisper_model.transcribe(
-            temp_path,
-            language="es",
-            beam_size=5,
-            vad_filter=True
-        )
-        
-        # Unir todos los segmentos de texto
-        transcript_text = " ".join(segment.text for segment in segments)
-        
-        return {"output": transcript_text}
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-    return app
+from datetime import datetime
+
+@app.route("/transcribe", methods=["POST"])
+def transcribe():
+    file = request.files["audio"]
+    buffer = io.BytesIO(file.read())
+
+    temp_path = "temp_audio.webm"
+    with open(temp_path, "wb") as f:
+        f.write(buffer.getbuffer())
+
+    segments, _ = whisper_model.transcribe(
+        temp_path,
+        language="es",
+        beam_size=5,
+        vad_filter=True
+    )
+
+    texto = " ".join(segment.text for segment in segments)
+
+    if any(palabra in texto.lower() for palabra in PALABRAS_CLAVE):
+        evento_id = str(uuid.uuid4())
+        mensaje = f"⚠️ Posible amenaza detectada"
+        evento = {
+            "id": evento_id,
+            "texto": texto,
+            "hora": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        eventos_detectados.append(evento)
+
+        # SSE con enlace al detalle
+        notificacion = {
+            "mensaje": mensaje,
+            "evento_id": evento_id
+        }
+
+        event_queue.put(notificacion)
+
+    return {"output": texto}
+
+
+
+@app.route("/stream")
+def stream():
+    def event_stream():
+        while True:
+            try:
+                data = event_queue.get(timeout=30)
+                yield f"data: {json.dumps(data)}\n\n"
+            except queue.Empty:
+                yield "data: \n\n"
+    return Response(event_stream(), content_type="text/event-stream")
+
+@app.route("/alerta/<evento_id>")
+def ver_alerta(evento_id):
+    evento = next((e for e in eventos_detectados if e["id"] == evento_id), None)
+    if not evento:
+        return "Evento no encontrado", 404
+    return render_template("alerta.html", evento=evento)
