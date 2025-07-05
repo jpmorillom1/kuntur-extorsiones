@@ -10,6 +10,8 @@ import json
 
 # Nueva variable global para guardar detalles
 eventos_detectados = []  # cada elemento será un dict con id, texto y timestamp
+# Dirección IP de la cámara (puede venir desde una BD en el futuro)
+IP_CAMARA = "http://192.168.100.53:8080/video"  # IP Webcam del celular
 
 
 
@@ -85,4 +87,4 @@ def ver_alerta(evento_id):
     evento = next((e for e in eventos_detectados if e["id"] == evento_id), None)
     if not evento:
         return "Evento no encontrado", 404
-    return render_template("alerta.html", evento=evento)
+    return render_template("alerta.html", evento=evento, ip_camera=IP_CAMARA)
