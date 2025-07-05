@@ -27,7 +27,7 @@ event_queue = queue.Queue()
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html",ip_camera=IP_CAMARA)
 
 from datetime import datetime
 
