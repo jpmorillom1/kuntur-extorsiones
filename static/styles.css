@@ -1,0 +1,111 @@
+/* Kuntur - Sistema AntiExtorsiones - Estilos */
+
+body {
+  background-color: #f8f9fa;
+}
+
+.header {
+  background: linear-gradient(to right, #0d6efd, #1e90ff);
+  color: white;
+  padding: 15px 0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.header img {
+  margin-right: 15px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.alert-box {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.sensor-box, .recording-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.camara-box .etiqueta {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: red;
+  color: white;
+  padding: 5px 10px;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.global-box {
+  border: 2px solid #007bff;
+  background-color: #f8fcff;
+}
+
+.recording-box .form-text {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.recent-alerts i {
+  color: red;
+}
+
+footer {
+  background: #212529;
+  color: #ddd;
+  font-size: 0.9em;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.video-frame {
+  width: 100%;
+  height: auto;
+  border: 1px solid #ccc;
+}
+
+.btn-alerta {
+  background-color: #f4a100;
+  border: none;
+  color: white;
+  font-weight: bold;
+}
+
+.output p {
+  margin-bottom: 8px;
+  padding: 8px;
+  background: white;
+  border-radius: 5px;
+  border-left: 3px solid #007bff;
+  font-size: 0.9em;
+}
+
+.recent-alerts .alert {
+  font-size: 0.85em;
+  margin-bottom: 8px;
+}
+
+.transcripcion-scroll {
+  max-height: 200px;
+  overflow-y: auto;
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #dee2e6;
+}
