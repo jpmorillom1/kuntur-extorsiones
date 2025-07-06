@@ -11,9 +11,7 @@ import json
 # Nueva variable global para guardar detalles
 eventos_detectados = []  # cada elemento será un dict con id, texto y timestamp
 # Dirección IP de la cámara (puede venir desde una BD en el futuro)
-IP_CAMARA = "http://192.168.100.53:8080/video"  # IP Webcam del celular
-
-
+IP_CAMARA = "http://192.168.100.11:8080/video"  # IP Webcam del celular
 
 
 app = Flask(__name__)
@@ -28,6 +26,10 @@ event_queue = queue.Queue()
 @app.route("/")
 def index():
     return render_template("index.html",ip_camera=IP_CAMARA)
+
+@app.route("/prueba")
+def prueba():
+    return render_template("prueba.html", ip_camera=IP_CAMARA)
 
 from datetime import datetime
 
@@ -88,3 +90,6 @@ def ver_alerta(evento_id):
     if not evento:
         return "Evento no encontrado", 404
     return render_template("alerta.html", evento=evento, ip_camera=IP_CAMARA)
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
