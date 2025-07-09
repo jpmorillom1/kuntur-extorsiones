@@ -8,9 +8,10 @@ from datetime import datetime
 import json
 from services.gemini_analyzer import procesar_evento_con_ia
 
-# Nueva variable global para guardar detalles
-eventos_detectados = []  # cada elemento será un dict con id, texto y timestamp
-# Dirección IP de la cámara (puede venir desde una BD en el futuro)
+# Variable global para guardar eventos
+eventos_detectados = []
+
+# Dirección IP de la cámara (puede venir de una BD)
 IP_CAMARA = "http://192.168.100.53:8080/video"  # IP Webcam del celular
 
 app = Flask(__name__)
@@ -19,18 +20,12 @@ whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
 # Palabras clave para alerta
 PALABRAS_CLAVE = {"extorsión", "arma", "matar", "dinero", "amenaza"}
 
-
-
 # Cola de eventos SSE
 event_queue = queue.Queue()
 
 @app.route("/")
 def index():
-    return render_template("index.html",ip_camera=IP_CAMARA)
-
-
-
-from datetime import datetime
+    return render_template("index.html", ip_camera=IP_CAMARA)
 
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
@@ -52,40 +47,29 @@ def transcribe():
 
     if any(palabra in texto.lower() for palabra in PALABRAS_CLAVE):
         evento_id = str(uuid.uuid4())
-        
-        # Crear evento básico
         evento = {
             "id": evento_id,
-            "texto": texto,  # Guardamos el texto transcrito
+            "texto": texto,
             "hora": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-        
-        print(f"🤖 Iniciando análisis de IA para: {texto[:50]}...")
-        
-        # Procesar con IA de forma síncrona para obtener el análisis
+
+        print(f"🤖 Análisis IA para: {texto[:50]}...")
+
         try:
             evento_enriquecido = procesar_evento_con_ia(evento)
-            print(f"✅ Análisis completado para evento: {evento_id}")
-            
-            # Guardar evento con análisis
+            print(f"✅ Análisis completado: {evento_id}")
             eventos_detectados.append(evento_enriquecido)
-            
         except Exception as e:
-            print(f"Error procesando con IA: {e}")
-            # Si falla IA, usar evento básico
+            print(f"Error IA: {e}")
             eventos_detectados.append(evento)
 
-        # SSE con mensaje simple para el index (no el análisis completo)
         notificacion = {
-            "mensaje": "⚠️ Posible amenaza detectada",  # Mensaje simple para index
+            "mensaje": "⚠️ Posible amenaza detectada",
             "evento_id": evento_id
         }
-
         event_queue.put(notificacion)
 
     return {"output": texto}
-
-
 
 @app.route("/stream")
 def stream():
@@ -107,3 +91,4 @@ def ver_alerta(evento_id):
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
+
