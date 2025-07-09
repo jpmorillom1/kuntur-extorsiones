@@ -3,3 +3,7 @@ faster-whisper
 torch
 numpy
 ffmpeg-python
+langchain
+langchain-google-genai
+google-generativeai
+python-dotenv
