@@ -11,14 +11,18 @@ import json
 # Nueva variable global para guardar detalles
 eventos_detectados = []  # cada elemento será un dict con id, texto y timestamp
 # Dirección IP de la cámara (puede venir desde una BD en el futuro)
-IP_CAMARA = "http://192.168.100.11:8080/video"  # IP Webcam del celular
+IP_CAMARA = "http://192.168.100.53:8080/video" # IP Webcam del celular
 
 
 app = Flask(__name__)
 whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
 
 # Palabras clave para alerta
+
+
 PALABRAS_CLAVE = {"extorsión", "arma", "matar", "dinero", "amenaza"}
+
+
 
 # Cola de eventos SSE
 event_queue = queue.Queue()
@@ -27,9 +31,7 @@ event_queue = queue.Queue()
 def index():
     return render_template("index.html",ip_camera=IP_CAMARA)
 
-@app.route("/prueba")
-def prueba():
-    return render_template("prueba.html", ip_camera=IP_CAMARA)
+
 
 from datetime import datetime
 
