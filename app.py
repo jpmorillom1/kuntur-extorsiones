@@ -3,23 +3,20 @@ from flask import Flask, render_template, request, Response
 from faster_whisper import WhisperModel
 import threading
 import queue
-import time
 import uuid
 from datetime import datetime
 import json
+from services.gemini_analyzer import procesar_evento_con_ia
 
 # Nueva variable global para guardar detalles
 eventos_detectados = []  # cada elemento será un dict con id, texto y timestamp
 # Dirección IP de la cámara (puede venir desde una BD en el futuro)
-IP_CAMARA = "http://192.168.100.53:8080/video" # IP Webcam del celular
-
+IP_CAMARA = "http://192.168.100.53:8080/video"  # IP Webcam del celular
 
 app = Flask(__name__)
 whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
 
 # Palabras clave para alerta
-
-
 PALABRAS_CLAVE = {"extorsión", "arma", "matar", "dinero", "amenaza"}
 
 
@@ -55,17 +52,32 @@ def transcribe():
 
     if any(palabra in texto.lower() for palabra in PALABRAS_CLAVE):
         evento_id = str(uuid.uuid4())
-        mensaje = f"⚠️ Posible amenaza detectada"
+        
+        # Crear evento básico
         evento = {
             "id": evento_id,
-            "texto": texto,
+            "texto": texto,  # Guardamos el texto transcrito
             "hora": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-        eventos_detectados.append(evento)
+        
+        print(f"🤖 Iniciando análisis de IA para: {texto[:50]}...")
+        
+        # Procesar con IA de forma síncrona para obtener el análisis
+        try:
+            evento_enriquecido = procesar_evento_con_ia(evento)
+            print(f"✅ Análisis completado para evento: {evento_id}")
+            
+            # Guardar evento con análisis
+            eventos_detectados.append(evento_enriquecido)
+            
+        except Exception as e:
+            print(f"Error procesando con IA: {e}")
+            # Si falla IA, usar evento básico
+            eventos_detectados.append(evento)
 
-        # SSE con enlace al detalle
+        # SSE con mensaje simple para el index (no el análisis completo)
         notificacion = {
-            "mensaje": mensaje,
+            "mensaje": "⚠️ Posible amenaza detectada",  # Mensaje simple para index
             "evento_id": evento_id
         }
 
