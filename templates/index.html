@@ -13,21 +13,22 @@
   <!-- Barra de navegación -->
   <header class="header">
     <div class="header-content">
-      <img src="{{ url_for('static', filename='logo_kuntur.png') }}" height="40" alt="Kuntur Logo"/>
-      <h1>Kuntur - Sistema AntiExtorsiones</h1>
+      <div class="d-flex align-items-center">
+        <img src="{{ url_for('static', filename='logo_kuntur.png') }}" height="40" alt="Kuntur Logo"/>
+        <h1 class="ms-2">Kuntur - Sistema AntiExtorsiones</h1>
+      </div>
     </div>
   </header>
 
   <!-- Contenido principal -->
   <div class="container mt-4">
     <div class="row">
-      <!-- Video + información víctima -->
+      <!-- Sección principal -->
       <div class="col-md-8">
-        <div class="card mb-3">
-            <div class="camara-box">
-                <div class="etiqueta">CÁMARA DE SEGURIDAD</div>
-                <img id="ip-camera" src="{{ ip_camera }}" alt="Cámara IP" class="w-100">
-            </div>
+        <div class="card mb-4 camara-box">
+          <div class="etiqueta">CÁMARA DE SEGURIDAD</div>
+          <br></br>
+          <img id="ip-camera" src="{{ ip_camera }}" alt="Cámara IP" class="w-100"/>
           <div class="card-body">
             <h6 class="card-title mb-1"><strong>Víctima:</strong> Alejandro Soto</h6>
             <p class="card-text text-muted">Calle Principal 123, Distrito Central</p>
@@ -35,17 +36,17 @@
         </div>
 
         <!-- Estado Global -->
-        <div class="card global-box p-3">
+        <div class="global-box p-3">
           <h6 class="text-success fw-bold">Estado Global</h6>
           <p class="mb-1">No se detectaron amenazas en la ubicación registrada.</p>
           <small class="text-muted"><i class="bi bi-clock"></i> Actualizado recientemente</small>
           <div class="mt-2 text-end">
-            <img src="{{ url_for('static', filename='logo_kuntur.png') }}" height="40" alt="Kuntur">
+            <img src="{{ url_for('static', filename='logo_kuntur.png') }}" height="40" alt="Kuntur Logo">
           </div>
         </div>
       </div>
 
-      <!-- Lado derecho -->
+      <!-- Columna lateral -->
       <div class="col-md-4">
 
         <!-- Botón de alerta -->
@@ -53,18 +54,22 @@
           <button class="btn btn-alerta"><i class="bi bi-bell-fill me-2"></i>Activar Alerta</button>
         </div>
 
-        <!-- Estado sensores -->
+        <!-- Sensores -->
         <div class="sensor-box">
           <h6 class="fw-bold">Estado de Sensores</h6>
-          <p><i class="bi bi-camera-video"></i> Cámara: <span class="badge text-bg-success">Activa</span> <span class="badge bg-light text-dark border">Grabando</span></p>
-          <p><i class="bi bi-mic-fill"></i> Micrófono: <span class="badge text-bg-success">Activo</span> <span class="badge bg-light text-dark border">Grabando</span></p>
+          <p><i class="bi bi-camera-video"></i> Cámara: 
+            <span class="badge text-bg-success">Activa</span>
+            <span class="badge bg-light text-dark border">Grabando</span></p>
+          <p><i class="bi bi-mic-fill"></i> Micrófono: 
+            <span class="badge text-bg-success">Activo</span>
+            <span class="badge bg-light text-dark border">Grabando</span></p>
         </div>
 
-        <!-- Sistema de grabación -->
+        <!-- Grabación -->
         <div class="recording-box">
           <h6 class="fw-bold">Sistema de Grabación</h6>
           <p class="text-muted"><i class="bi bi-wifi-off"></i> Listo para Grabar</p>
-          <small class="form-text text-muted">
+          <small class="form-text">
             <i class="bi bi-link-45deg"></i> Ubicación de Grabaciones: <br>
             <a href="#" class="text-muted text-decoration-none">https://BackBlaze_Kuntur</a>
           </small>
@@ -76,7 +81,7 @@
           <div id="alert-container"></div>
         </div>
 
-        <!-- Transcripción en Tiempo Real -->
+        <!-- Transcripción -->
         <div class="recording-box mt-3">
           <h6 class="fw-bold">Transcripción en Tiempo Real</h6>
           <div class="output transcripcion-scroll"></div>
@@ -87,7 +92,7 @@
 
   <!-- Footer -->
   <footer>
-    © 2023 Kuntur. All rights reserved.
+    © 2023 Kuntur. Todos los derechos reservados.
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -120,3 +125,4 @@
   </script>
 </body>
 </html>
+
