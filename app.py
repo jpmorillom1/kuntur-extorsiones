@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 # Nueva variable global para guardar detalles
 eventos_detectados = []  # cada elemento será un dict con id, texto y timestamp
 # Dirección IP de la cámara (puede venir desde una BD en el futuro)
-IP_CAMARA = "http://192.168.100.53:8080/video"  # IP Webcam del celular
+IP_CAMARA = "http://192.168.100.11:8080/video"  # IP Webcam del celular
 
 app = Flask(__name__)
 whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
@@ -35,13 +35,14 @@ def index():
 
 
 
-from datetime import datetime
+
 
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
-    file = request.files["audio"]
-    buffer = io.BytesIO(file.read())
+    file = request.files["audio"]       #Recibe el audio
+    buffer = io.BytesIO(file.read())    #Convierte en bytes
 
+    # Guardar el audio temporalmente
     temp_path = "temp_audio.webm"
     with open(temp_path, "wb") as f:
         f.write(buffer.getbuffer())
@@ -51,14 +52,15 @@ def transcribe():
         temp_path,
         language="es",
         beam_size=5,
-        vad_filter=True
+        vad_filter=True #Detecta cuando hay voz
     )
 
+    # Une todo el texto transcrito
     texto = " ".join(segment.text for segment in segments)
 
     # Verificar si hay palabras clave
     if any(palabra in texto.lower() for palabra in PALABRAS_CLAVE):
-        evento_id = str(uuid.uuid4())
+        evento_id = str(uuid.uuid4()) # Generar ID único para el evento
         
         # Crear evento básico
         evento = {
@@ -101,14 +103,14 @@ def transcribe():
             "mensaje": "⚠️ Posible amenaza detectada",
             "evento_id": evento_id
         }
-        event_queue.put(notificacion)
+        event_queue.put(notificacion) #Alerta al navegador
 
     # Respuesta al cliente
     return {"output": texto}
 
 
 
-
+#Mantiene la conexión abierta para enviar eventos SSE
 @app.route("/stream")
 def stream():
     def event_stream():
@@ -127,7 +129,7 @@ def ver_alerta(evento_id):
         return "Evento no encontrado", 404
     return render_template("alerta.html", evento=evento, ip_camera=IP_CAMARA)
 
-
+#Mantiene la camara abierta en vivo
 def generar_frames():
     cap = cv2.VideoCapture(IP_CAMARA)
     while True:
