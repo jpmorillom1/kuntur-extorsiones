@@ -7,3 +7,6 @@ langchain
 langchain-google-genai
 google-generativeai
 python-dotenv
+opencv-python
+imageio
+b2sdk
