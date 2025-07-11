@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 # Nueva variable global para guardar detalles
 eventos_detectados = []  # cada elemento será un dict con id, texto y timestamp
 # Dirección IP de la cámara (puede venir desde una BD en el futuro)
-IP_CAMARA = "http://192.168.100.11:8080/video"  # IP Webcam del celular
+IP_CAMARA = "http://192.168.100.53:8080/video"  # IP Webcam del celular
 
 app = Flask(__name__)
 whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
@@ -144,6 +144,68 @@ def generar_frames():
 @app.route('/video_feed')
 def video_feed():
     return Response(generar_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route("/alerta_manual", methods=["POST"])
+def alerta_manual():
+    evento_id = str(uuid.uuid4())
+    texto_simulado = "Se reporta una amenaza directa en el lugar, se requiere atención inmediata."
+
+    evento = {
+        "id": evento_id,
+        "texto": texto_simulado,
+        "hora": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "manual": True  # Puedes usar esto para distinguir
+    }
+
+    # Procesar con IA
+    try:
+        evento_enriquecido = procesar_evento_con_ia(evento)
+    except Exception as e:
+        print(f"❌ Error IA en alerta manual: {e}")
+        evento_enriquecido = evento
+        evento_enriquecido["analisis_ia"] = "No disponible"
+        evento_enriquecido["timestamp_analisis"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # Subir evidencia de video
+    try:
+        print("🎥 Grabando video de evidencia (manual)...")
+        link_video = grabar_y_subir_video(
+            IP_CAMARA,
+            bucket_name="kuntur-extorsiones",
+            key_id=os.getenv("B2_KEY_ID"),
+            app_key=os.getenv("B2_APP_KEY")
+        )
+        evento_enriquecido["link_evidencia"] = link_video
+        print(f"📹 Video subido: {link_video}")
+    except Exception as e:
+        print(f"⚠️ No se pudo subir el video: {e}")
+        evento_enriquecido["link_evidencia"] = "No disponible"
+
+    eventos_detectados.append(evento_enriquecido)
+
+    notificacion = {
+        "mensaje": "🚨 Alerta manual activada",
+        "evento_id": evento_id
+    }
+    event_queue.put(notificacion)
+
+    return {"status": "ok", "evento_id": evento_id}
+
+
+@app.route("/estado_camara")
+def estado_camara():
+    try:
+        cap = cv2.VideoCapture(IP_CAMARA)
+        success, _ = cap.read()
+        cap.release()
+        if success:
+            return {"estado": "activa"}
+        else:
+            return {"estado": "inactiva"}
+    except:
+        return {"estado": "inactiva"}
+
+
 
 
 
