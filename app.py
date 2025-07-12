@@ -12,18 +12,20 @@ from services.video_uploader import grabar_y_subir_video
 import os
 from dotenv import load_dotenv
 from services.threat_detector import es_texto_amenaza
+from services.db import coleccion_alertas
+
+from bson import ObjectId
+usuario_id = ObjectId("665abc1234567890abcde123")  # Simulado
 
 
 # Nueva variable global para guardar detalles
 eventos_detectados = []  # cada elemento será un dict con id, texto y timestamp
+
 # Dirección IP de la cámara (puede venir desde una BD en el futuro)
 IP_CAMARA = "http://192.168.100.53:8080/video"  # IP Webcam del celular
 
 app = Flask(__name__)
 whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
-
-# Palabras clave para alerta
-PALABRAS_CLAVE = {"extorsión", "arma", "matar", "dinero", "amenaza"}
 
 
 
@@ -111,6 +113,21 @@ def transcribe():
         }
         print(notificacion)
         event_queue.put(notificacion)
+
+        riesgo = "MEDIO"
+        for nivel in ["CRÍTICO", "ALTO", "MEDIO", "BAJO"]:
+            if nivel.lower() in evento_enriquecido["analisis_ia"].lower():
+                riesgo = nivel
+                break
+
+        coleccion_alertas.insert_one({
+            "id_usuario": usuario_id,  # obtendrás esto del contexto
+            "texto_detectado": evento_enriquecido["texto"],
+            "descripcion_alerta": evento_enriquecido["analisis_ia"],
+            "nivel_riesgo": riesgo,
+            "fecha": datetime.now(),
+            "link_evidencia": evento_enriquecido.get("link_evidencia", "No disponible")
+})
 
 
     # Respuesta al cliente
