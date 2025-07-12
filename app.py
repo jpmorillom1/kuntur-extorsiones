@@ -11,6 +11,7 @@ import cv2
 from services.video_uploader import grabar_y_subir_video
 import os
 from dotenv import load_dotenv
+from services.threat_detector import es_texto_amenaza
 
 
 # Nueva variable global para guardar detalles
@@ -59,7 +60,7 @@ def transcribe():
     texto = " ".join(segment.text for segment in segments)
 
     # Verificar si hay palabras clave
-    if any(palabra in texto.lower() for palabra in PALABRAS_CLAVE):
+    if es_texto_amenaza(texto):
         evento_id = str(uuid.uuid4()) # Generar ID único para el evento
         
         # Crear evento básico
@@ -100,10 +101,17 @@ def transcribe():
 
         # Enviar notificación por SSE
         notificacion = {
-            "mensaje": "⚠️ Posible amenaza detectada",
-            "evento_id": evento_id
+            "mensaje": "🚨 Alerta crítica detectada",
+            "evento_id": evento_id,
+            "texto": evento_enriquecido["texto"],
+            "link_evidencia": evento_enriquecido.get("link_evidencia", ""),
+            "ip_camera": IP_CAMARA,
+            "analisis": evento_enriquecido.get("analisis_ia", "Sin análisis"),
+            "hora": evento_enriquecido["hora"]
         }
-        event_queue.put(notificacion) #Alerta al navegador
+        print(notificacion)
+        event_queue.put(notificacion)
+
 
     # Respuesta al cliente
     return {"output": texto}
