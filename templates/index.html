@@ -8,7 +8,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet"/>
 </head>
-<body class="bg-gray">
+<body class="bg-gray d-flex flex-column min-vh-100">
 
 <!-- Header con logo -->
 <nav class="navbar px-4 d-flex justify-content-between align-items-center gradient-purple-header">
@@ -19,7 +19,7 @@
 </nav>
 
 <!-- Contenido -->
-<div class="container my-4">
+<div class="container my-2 flex-grow-1">
   <div class="row">
     <!-- Cámara -->
     <div class="col-lg-8 mb-3">
@@ -31,8 +31,8 @@
           <img src="{{ url_for('video_feed') }}" alt="Cámara en vivo" class="img-fluid rounded w-100" id="video_feed">
         </div>
         <div class="card-footer gradient-purple">
-          <strong class="text-white">Víctima:</strong> <span class="text-white">Alejandro Soto</span> <br>
-          <small class="text-white-50">📍 Calle Principal 123, Distrito Central</small>
+          <strong class="text-white">Usuario:</strong> <span class="text-white">Alejandro Soto</span> <br>
+          <small class="text-white">📍 Calle Principal 123, Distrito Central</small>
         </div>
       </div>
     </div>
@@ -67,15 +67,13 @@
       <!-- Alertas recientes -->
       <div class="gradient-purple mb-3">
         <h6>🚨 Alertas Recientes</h6>
-        <div id="alert-container">
-        </div>
+        <div id="alert-container" class="gradient-purple text-dark p-2 rounded" style="height: 200px; overflow-y: auto;">        </div>
       </div>
 
       <!-- Transcripción -->
       <div class="gradient-purple">
         <h6>📝 Transcripción en Tiempo Real</h6>
-        <div class="bg-white text-dark p-2 rounded transcripcion-scroll output" style="height: 100px; overflow-y: auto;">
-          <!-- Contenido generado por JS -->
+        <div class="bg-white text-dark p-2 rounded transcripcion-scroll output" style="height: 125px; overflow-y: auto;">
         </div>
       </div>
     </div>
