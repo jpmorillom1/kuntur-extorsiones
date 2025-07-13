@@ -63,8 +63,8 @@
         <div class="card-header gradient-purple">
           <h5 class="text-white">🔴 Transmisión en Vivo</h5>
         </div>
-        <div class="card-body d-flex justify-content-center align-items-center">
-          <img id="ip-camera" src="/video_feed" alt="Transmisión en vivo no disponible" class="img-fluid rounded" style="max-height: 70vh; width: auto;">
+        <div class="card-body d-flex justify-content-center align-items-center p-0">
+          <img src="{{ url_for('video_feed') }}" alt="Cámara en vivo" class="img-fluid w-100 h-100" style="object-fit: cover;" id="video_feed">
         </div>
         <div class="card-footer gradient-purple">
           <small class="text-white-50">📡 Conexión en tiempo real</small>

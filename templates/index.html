@@ -23,12 +23,12 @@
   <div class="row">
     <!-- Cámara -->
     <div class="col-lg-8 mb-3">
-      <div class="card card-custom">
+      <div class="card card-custom h-100">
         <div class="card-header gradient-purple">
           <h5 class="text-white">📹 Cámara de Seguridad</h5>
         </div>
-        <div class="card-body d-flex justify-content-center">
-          <img src="{{ url_for('video_feed') }}" alt="Cámara en vivo" class="img-fluid rounded w-100" id="video_feed">
+        <div class="card-body d-flex justify-content-center align-items-center p-0">
+          <img src="{{ url_for('video_feed') }}" alt="Cámara en vivo" class="img-fluid w-100 h-100" style="object-fit: cover;" id="video_feed">
         </div>
         <div class="card-footer gradient-purple">
           <strong class="text-white">Usuario:</strong> <span class="text-white">Alejandro Soto</span> <br>
@@ -43,7 +43,7 @@
     <!-- Control del sistema -->
     <div class="gradient-purple mb-3">
       <h6>🛡️ Control del Sistema</h6>
-      <button class="btn btn-light w-100 mb-2" id="activarAlertaManual">🚨 Activar alerta manual</button>
+      <button class="btn btn-light w-100 mb-2 btn-lg" id="activarAlertaManual">🚨 Activar alerta manual</button>
 
       <!-- Estado cámara -->
       <div class="d-flex justify-content-between">
