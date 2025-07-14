@@ -1,16 +1,5 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
+from services.gemini_provider import get_llm
 from langchain.prompts import ChatPromptTemplate
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0.3,
-    convert_system_message_to_human=True,
-    google_api_key=os.getenv("GOOGLE_API_KEY")
-)
 
 prompt_template = ChatPromptTemplate.from_messages([
     ("human", """
@@ -25,10 +14,10 @@ prompt_template = ChatPromptTemplate.from_messages([
 
 def es_texto_amenaza(texto: str) -> bool:
     try:
+        llm = get_llm()
         prompt = prompt_template.format_messages(texto=texto)
         response = llm.invoke(prompt)
-        respuesta = response.content.strip().lower()
-        return respuesta == "si"
+        return response.content.strip().lower() == "si"
     except Exception as e:
         print(f"❌ Error en verificación de amenaza: {e}")
         return False

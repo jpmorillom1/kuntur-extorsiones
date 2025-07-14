@@ -14,6 +14,7 @@ from services.gemini_analyzer import procesar_evento_con_ia
 from services.video_uploader import grabar_y_subir_video
 from services.db import coleccion_alertas
 from services.global_state import  event_queue, eventos_detectados
+from services.notificador_upc import notificar_a_upc
 
 transcribe_bp = Blueprint("transcribe", __name__)
 whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
@@ -111,5 +112,12 @@ def transcribe():
             "fecha": datetime.now(),
             "link_evidencia": evento_enriquecido.get("link_evidencia", "No disponible")
         })
+
+        notificar_a_upc(
+            descripcion=evento_enriquecido["analisis_ia"],
+            ubicacion=evento_enriquecido["ubicacion"],
+            ip_camara=evento_enriquecido["ip_camara"],
+            url_evidencia=evento_enriquecido.get("link_evidencia")
+        )
 
     return {"output": texto}
