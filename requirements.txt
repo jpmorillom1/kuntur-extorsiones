@@ -16,3 +16,4 @@ fastembed
 keybert
 nltk
 requests
+gunicorn
