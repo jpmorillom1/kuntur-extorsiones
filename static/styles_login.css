@@ -1,0 +1,271 @@
+/* Kuntur - Login Page Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.login-container {
+    display: flex;
+    height: 100vh;
+    position: relative;
+}
+
+.login-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #74409B 0%, #384C81 100%);
+    z-index: 1;
+}
+
+.background-logo {
+    position: absolute;
+    right: -10%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 80%;
+    height: auto;
+    opacity: 0.1;
+    filter: brightness(0) invert(1);
+}
+
+.login-card {
+    position: absolute;
+    z-index: 2;
+    background: white;
+    width: 450px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    left: 15%;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    min-height: auto;
+    max-width: 90%;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+    gap: 15px;
+}
+
+.logo-circle {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #74409B 0%, #384C81 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.logo-img {
+    width: 30px;
+    height: 30px;
+    filter: brightness(0) invert(1);
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2c3e50;
+    letter-spacing: 1px;
+}
+
+.brand-subtitle {
+    font-size: 12px;
+    color: #7f8c8d;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.login-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+.error-alert {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+
+.input-container:focus-within {
+    border-color: #74409B;
+    box-shadow: 0 0 0 3px rgba(116, 64, 155, 0.1);
+}
+
+.input-icon {
+    font-size: 18px;
+    margin-right: 12px;
+    color: #6c757d;
+}
+
+.input-container input {
+    border: none;
+    background: transparent;
+    outline: none;
+    flex: 1;
+    font-size: 16px;
+    color: #2c3e50;
+}
+
+.input-container input::placeholder {
+    color: #6c757d;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #74409B 0%, #384C81 100%);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(116, 64, 155, 0.3);
+}
+
+.btn-login:active {
+    transform: translateY(0);
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.register-link a {
+    color: #74409B;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.register-link a:hover {
+    color: #384C81;
+    text-decoration: underline;
+}
+
+/* Estilos adicionales para el registro */
+.register-card {
+    width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.map-label {
+    font-size: 14px;
+    color: #495057;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.map-container {
+    height: 250px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.map-container:focus-within {
+    border-color: #74409B;
+    box-shadow: 0 0 0 3px rgba(116, 64, 155, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-card {
+        width: 90%;
+        left: 5%;
+        padding: 30px;
+    }
+    
+    .register-card {
+        width: 95%;
+        left: 2.5%;
+        padding: 25px;
+        max-height: 95vh;
+    }
+    
+    .map-container {
+        height: 200px;
+    }
+    
+    .background-logo {
+        right: -20%;
+        width: 100%;
+    }
+    
+    .logo-container {
+        margin-bottom: 30px;
+    }
+    
+    .brand-name {
+        font-size: 20px;
+    }
+    
+    .login-title {
+        font-size: 20px;
+        margin-bottom: 25px;
+    }
+}

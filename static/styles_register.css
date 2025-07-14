@@ -1,0 +1,320 @@
+/* Kuntur - Register Page Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    height: 100vh;
+    overflow-x: hidden;
+}
+
+.register-container {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+}
+
+.register-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #74409B 0%, #384C81 100%);
+    z-index: 1;
+}
+
+.background-logo {
+    position: absolute;
+    right: -10%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60%;
+    height: auto;
+    opacity: 0.08;
+    filter: brightness(0) invert(1);
+}
+
+.register-card {
+    position: relative;
+    z-index: 2;
+    background: white;
+    width: 800px;
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    min-height: auto;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 15px;
+    justify-content: center;
+}
+
+.logo-circle {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #74409B 0%, #384C81 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.logo-img {
+    width: 30px;
+    height: 30px;
+    filter: brightness(0) invert(1);
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2c3e50;
+    letter-spacing: 1px;
+}
+
+.brand-subtitle {
+    font-size: 12px;
+    color: #7f8c8d;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.register-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.error-alert {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+
+.input-container:focus-within {
+    border-color: #74409B;
+    box-shadow: 0 0 0 3px rgba(116, 64, 155, 0.1);
+}
+
+.input-icon {
+    font-size: 18px;
+    margin-right: 12px;
+    color: #6c757d;
+}
+
+.input-container input {
+    border: none;
+    background: transparent;
+    outline: none;
+    flex: 1;
+    font-size: 16px;
+    color: #2c3e50;
+}
+
+.input-container input::placeholder {
+    color: #6c757d;
+}
+
+.map-container {
+    margin-top: 5px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#map {
+    height: 300px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+}
+
+.map-instructions {
+    background: #f8f9fa;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    font-size: 14px;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.instruction-icon {
+    font-size: 16px;
+    color: #74409B;
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn-register {
+    background: linear-gradient(135deg, #74409B 0%, #384C81 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(116, 64, 155, 0.3);
+}
+
+.btn-register:active {
+    transform: translateY(0);
+}
+
+.btn-back {
+    background: transparent;
+    color: #74409B;
+    border: 2px solid #74409B;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-back:hover {
+    background: #74409B;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(116, 64, 155, 0.3);
+}
+
+.btn-back:active {
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .register-card {
+        width: 95%;
+        margin: 10px auto;
+        padding: 25px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .background-logo {
+        right: -30%;
+        width: 100%;
+    }
+    
+    .logo-container {
+        margin-bottom: 25px;
+    }
+    
+    .brand-name {
+        font-size: 20px;
+    }
+    
+    .register-title {
+        font-size: 18px;
+        margin-bottom: 25px;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    #map {
+        height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .register-card {
+        padding: 20px;
+        margin: 5px;
+        width: calc(100% - 10px);
+    }
+    
+    .logo-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .brand-text {
+        text-align: center;
+    }
+}

@@ -7,10 +7,30 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+  <style>
+    #mapa-ubicacion {
+      width: 100%;
+      height: 250px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .leaflet-container {
+      background-color: #f8f9fa;
+    }
+
+    .leaflet-popup-content {
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body class="bg-gray d-flex flex-column min-vh-100">
 
-<!-- Header con logo -->
+<!-- Header -->
 <nav class="navbar px-4 d-flex justify-content-between align-items-center gradient-purple-header">
   <div class="d-flex align-items-center">
     <img src="{{ url_for('static', filename='Kuntur_blanco.png') }}" height="40" alt="Logo Kuntur"/>
@@ -32,9 +52,11 @@
             <div class="col-md-12">
               <strong>⏰ Hora de detección:</strong><br>
               <span class="text-muted">{{ evento.hora or "No disponible" }}</span>
+              <p><strong>📍 Local:</strong> {{ evento.nombre_local }}</p>
+              <p><strong>📌 Ubicación:</strong> {{ evento.ubicacion }}</p>
             </div>
           </div>
-          
+
           <div class="mb-3">
             <strong>📝 Texto detectado:</strong>
             <div class="alert alert-warning mt-2">
@@ -45,7 +67,7 @@
               {% endif %}
             </div>
           </div>
-          
+
           {% if evento.link_evidencia %}
           <div class="mb-3">
             <a href="{{ evento.link_evidencia }}" target="_blank" class="btn btn-outline-primary">
@@ -53,6 +75,19 @@
             </a>
           </div>
           {% endif %}
+
+          <div class="mb-3">
+            <strong>🗺️ Ubicación en el Mapa:</strong>
+            <div id="mapa-ubicacion" class="mt-2"
+                 data-lat="{{ evento.latitud }}"
+                 data-lng="{{ evento.longitud }}"
+                 data-nombre="{{ evento.nombre_local }}"
+                 data-direccion="{{ evento.ubicacion }}">
+            </div>
+            <div class="text-muted mt-2 small">
+              Coordenadas: {{ evento.latitud }}, {{ evento.longitud }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -64,7 +99,7 @@
           <h5 class="text-white">🔴 Transmisión en Vivo</h5>
         </div>
         <div class="card-body d-flex justify-content-center align-items-center">
-          <img id="ip-camera" src="/video_feed" alt="Transmisión en vivo no disponible" class="img-fluid rounded" style="max-height: 70vh; width: auto;">
+          <img id="ip-camera" src="{{ evento.ip_camara }}" alt="Transmisión en vivo no disponible" class="img-fluid rounded" style="max-height: 70vh; width: auto;">
         </div>
         <div class="card-footer gradient-purple">
           <small class="text-white-50">📡 Conexión en tiempo real</small>
@@ -81,6 +116,10 @@
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+<script src="{{ url_for('static', filename='mapa_alerta.js') }}"></script>
 
 </body>
 </html>

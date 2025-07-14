@@ -31,8 +31,8 @@
           <img src="{{ url_for('video_feed') }}" alt="Cámara en vivo" class="img-fluid rounded w-100" id="video_feed">
         </div>
         <div class="card-footer gradient-purple">
-          <strong class="text-white">Usuario:</strong> <span class="text-white">Alejandro Soto</span> <br>
-          <small class="text-white">📍 Calle Principal 123, Distrito Central</small>
+          <strong class="text-white">Usuario:</strong> <span class="text-white">{{ nombre_local }}</span> <br>
+          <small class="text-white">📍 {{ ubicacion }}</small>
         </div>
       </div>
     </div>

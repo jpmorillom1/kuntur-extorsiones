@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - Kuntur</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles_register.css') }}">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-background">
+            <img src="{{ url_for('static', filename='Kuntur_blanco.png') }}" alt="Kuntur Logo" class="background-logo">
+        </div>
+        
+        <div class="register-card">
+            <div class="logo-container">
+                <div class="logo-circle">
+                    <img src="{{ url_for('static', filename='Kuntur_blanco.png') }}" alt="Kuntur Logo" class="logo-img">
+                </div>
+                <div class="brand-text">
+                    <span class="brand-name">KUNTUR</span>
+                    <span class="brand-subtitle">ANTIEXTORSIONES</span>
+                </div>
+            </div>
+            
+            <h2 class="register-title">REGISTRO DE NUEVO LOCAL</h2>
+            
+            {% if error %}
+                <div class="alert alert-danger error-alert">{{ error }}</div>
+            {% endif %}
+            
+            <form method="POST" class="register-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nombre del local</label>
+                        <div class="input-container">
+                            <span class="input-icon">🏪</span>
+                            <input type="text" name="nombre_local" placeholder="Ingresa el nombre del local" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">IP de la cámara</label>
+                        <div class="input-container">
+                            <span class="input-icon">📹</span>
+                            <input type="text" name="ip_camara" placeholder="Ej: http://192.168.100.1:8080/video" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <div class="input-container">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" name="password" placeholder="Crea una contraseña segura" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Ubicación del Local</label>
+                    <div class="map-container">
+                        <div id="map"></div>
+                        <div class="map-instructions">
+                            <span class="instruction-icon">📍</span>
+                            Haz clic en el mapa para seleccionar la ubicación de tu local
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Dirección</label>
+                    <div class="input-container">
+                        <span class="input-icon">📍</span>
+                        <input type="text" name="ubicacion" placeholder="Se llenará automáticamente al seleccionar en el mapa" required>
+                    </div>
+                </div>
+                
+                <input type="hidden" id="lat" name="latitud">
+                <input type="hidden" id="lng" name="longitud">
+                
+                <div class="button-group">
+                    <button type="submit" class="btn-register">REGISTRAR LOCAL</button>
+                    <a href="/" class="btn-back">Volver al inicio</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='register_map.js') }}"></script>
+
+</body>
+</html>
