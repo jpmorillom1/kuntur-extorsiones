@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://i.ibb.co/V0kz681r/output-onlinepngtools-com.png" alt="Kuntur Logo" width="200"/>
+</p>
+
 # 🦅 Kuntur - Sistema AntiExtorsiones
 
 Sistema inteligente para la **detección automática y manual de amenazas** en locales comerciales mediante transcripción de audio, análisis con inteligencia artificial, grabación de evidencia en video y notificación directa a las autoridades (UPC).
