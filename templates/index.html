@@ -28,7 +28,7 @@
           <h5 class="text-white">📹 Cámara de Seguridad</h5>
         </div>
         <div class="card-body d-flex justify-content-center">
-          <img src="{{ url_for('video_feed') }}" alt="Cámara en vivo" class="img-fluid rounded w-100" id="video_feed">
+        <img src="{{ url_for('stream.video_feed') }}" alt="Cámara en vivo" class="img-fluid rounded w-100" id="video_feed">
         </div>
         <div class="card-footer gradient-purple">
           <strong class="text-white">Usuario:</strong> <span class="text-white">{{ nombre_local }}</span> <br>
