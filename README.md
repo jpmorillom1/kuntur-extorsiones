@@ -116,11 +116,13 @@ Accede en: [http://localhost:5000](http://localhost:5000)
 │   ├── alerta_routes.py      # Alerta manual
 │   └── stream_routes.py      # Video en vivo (IP Cam)
 ├── services/
+│   ├── gemini_provider.py
 │   ├── gemini_analyzer.py    # Análisis con IA
 │   ├── threat_detector.py    # Clasificador SI/NO
 │   ├── video_uploader.py     # Grabación + subida a Backblaze
 │   ├── notificador_upc.py    # Envío de JSON al API UPC
 │   ├── global_state.py       # Eventos recientes y SSE
+│   ├──auth.py
 │   └── db.py                 # Conexión MongoDB
 ├── templates/                # HTMLs (login, panel)
 └── static/                   # CSS, logo, scripts
@@ -142,15 +144,14 @@ Accede en: [http://localhost:5000](http://localhost:5000)
 | Notificación    | Server-Sent Events + JSON    |
 
 ---
-
 ## 🤝 Créditos
 
 Proyecto desarrollado por estudiantes de Ingeniería en Sistemas para la materia de Desarrollo de Sistemas de Información.
 
-Coordinación con la UPC para integración del sistema de alertas comunitarias.
+- Emily Guerron
+- Juan Pablo Morillo  
+- Alex Tituaña  
+
 
 ---
 
-## 📄 Licencia
-
-Este proyecto se distribuye bajo licencia MIT. Puedes usarlo, modificarlo y adaptarlo para fines académicos o comunitarios.
