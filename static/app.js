@@ -36,6 +36,7 @@ if (navigator.mediaDevices.getUserMedia) {
                 }, 5000); // 5 segundos
             }
         }
+   
 
         // Repetir grabación cada 5 segundos
         setInterval(recordFor5Seconds, 5000);
