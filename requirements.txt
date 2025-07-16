@@ -17,3 +17,5 @@ keybert
 nltk
 requests
 gunicorn
+transformers
+Pillow

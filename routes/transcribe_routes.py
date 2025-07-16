@@ -54,6 +54,22 @@ def transcribe():
             "longitud": session.get("longitud")
         }
 
+        # Captura de video y descripción visual
+        try:
+            link_video, descripcion_visual = grabar_y_subir_video(
+                session["ip_camara"],
+                bucket_name="kuntur-extorsiones",
+                key_id=os.getenv("B2_KEY_ID"),
+                app_key=os.getenv("B2_APP_KEY")
+            )
+            evento["link_evidencia"] = link_video
+            evento["descripcion_visual"] = descripcion_visual
+        except Exception as e:
+            print(f"⚠️ Error subiendo video o generando descripción visual: {e}")
+            evento["link_evidencia"] = "No disponible"
+            evento["descripcion_visual"] = "No disponible"
+
+        # Enviar a IA con texto + descripción visual
         try:
             evento_enriquecido = procesar_evento_con_ia(evento)
         except Exception as e:
@@ -61,21 +77,10 @@ def transcribe():
             evento_enriquecido = evento
             evento_enriquecido["analisis_ia"] = "No disponible"
 
-        try:
-            link_video = grabar_y_subir_video(
-                session["ip_camara"],
-                bucket_name="kuntur-extorsiones",
-                key_id=os.getenv("B2_KEY_ID"),
-                app_key=os.getenv("B2_APP_KEY")
-            )
-            evento_enriquecido["link_evidencia"] = link_video
-        except Exception as e:
-            print(f"⚠️ Error subiendo video: {e}")
-            evento_enriquecido["link_evidencia"] = "No disponible"
-
         eventos_detectados.append(evento_enriquecido)
 
-        notificacion = {
+        # Notificación SSE
+        event_queue.put({
             "mensaje": "🚨 Alerta crítica detectada",
             "evento_id": evento_id,
             "texto": evento_enriquecido["texto"],
@@ -87,10 +92,7 @@ def transcribe():
             "ubicacion": evento_enriquecido.get("ubicacion"),
             "latitud": evento_enriquecido.get("latitud"),
             "longitud": evento_enriquecido.get("longitud")
-        }
-
-        print("🔔 Notificación:", notificacion)
-        event_queue.put(notificacion)
+        })
 
         # Guardar en MongoDB
         riesgo = "MEDIO"
@@ -108,6 +110,7 @@ def transcribe():
             "longitud": evento_enriquecido.get("longitud"),
             "texto_detectado": evento_enriquecido["texto"],
             "descripcion_alerta": evento_enriquecido["analisis_ia"],
+            "descripcion_visual": evento_enriquecido.get("descripcion_visual", "No disponible"),
             "nivel_riesgo": riesgo,
             "fecha": datetime.now(),
             "link_evidencia": evento_enriquecido.get("link_evidencia", "No disponible")
@@ -121,3 +124,4 @@ def transcribe():
         )
 
     return {"output": texto}
+

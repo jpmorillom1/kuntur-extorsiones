@@ -3,6 +3,8 @@ import io
 import cv2
 import imageio
 import b2sdk.v2
+from services.caption_generator import generar_descripcion
+
 
 def grabar_y_subir_video(camera_ip_url, bucket_name, key_id, app_key):
     cap = cv2.VideoCapture(camera_ip_url)
@@ -12,25 +14,37 @@ def grabar_y_subir_video(camera_ip_url, bucket_name, key_id, app_key):
     fps = 20
     segundos = 5
     total_frames = fps * segundos
+    frame_medio_idx = total_frames // 2
 
     video_buffer = io.BytesIO()
     writer = imageio.get_writer(video_buffer, format='mp4', fps=fps, macro_block_size=None)
 
+    descripcion_visual = "No disponible"
     try:
         frames_grabados = 0
+        frame_para_describir = None
+
         while frames_grabados < total_frames:
             ret, frame = cap.read()
             if not ret:
-                print("⚠️ No se pudo leer frame, reintentando...")
-                time.sleep(0.05)  # pequeña espera si falla
+                time.sleep(0.05)
                 continue
+
+            if frames_grabados == frame_medio_idx:
+                frame_para_describir = frame.copy()
+
             writer.append_data(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
             frames_grabados += 1
+
+        # Generar caption si se capturó el frame del medio
+        if frame_para_describir is not None:
+            descripcion_visual = generar_descripcion(frame_para_describir)
+
     finally:
         cap.release()
         writer.close()
 
-    # Subir a Backblaze
+    # Subir video a Backblaze
     info = b2sdk.v2.InMemoryAccountInfo()
     b2_api = b2sdk.v2.B2Api(info)
     b2_api.authorize_account("production", key_id, app_key)
@@ -39,4 +53,6 @@ def grabar_y_subir_video(camera_ip_url, bucket_name, key_id, app_key):
     file_name = f"evidencia_{int(time.time())}.mp4"
     bucket.upload_bytes(video_buffer.getvalue(), file_name)
 
-    return f"https://f005.backblazeb2.com/file/{bucket_name}/{file_name}"
+    url_video = f"https://f005.backblazeb2.com/file/{bucket_name}/{file_name}"
+
+    return url_video, descripcion_visual
