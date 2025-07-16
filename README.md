@@ -13,6 +13,7 @@ Sistema inteligente para la **detección automática y manual de amenazas** en l
 - 🎙️ Transcripción en tiempo real con `Faster-Whisper`
 - 🧠 Análisis semántico con IA (`Gemini 2.5` + `LangChain`)
 - 🔍 Detección de amenazas mediante modelos de lenguaje
+- 🖼️ Descripción visual de frames con `BLIP Image Captioning`
 - 🎥 Grabación automática de video desde cámara IP
 - ☁️ Subida segura de evidencia a `Backblaze B2`
 - 📍 Geolocalización del local mediante `Leaflet + Nominatim`
@@ -34,6 +35,7 @@ Frontend (HTML + Bootstrap)
 │       └── Análisis profesional en 3-4 líneas
 │
 ├── Grabación desde IP Cam (OpenCV + imageio)
+│   ├── Descripción visual del frame central (BLIP)
 │   └── Subida a Backblaze B2
 │
 ├── MongoDB → Persistencia de alertas y usuarios
@@ -122,6 +124,7 @@ Accede en: [http://localhost:5000](http://localhost:5000)
 │   ├── gemini_provider.py
 │   ├── gemini_analyzer.py    # Análisis con IA
 │   ├── threat_detector.py    # Clasificador SI/NO
+│   ├── caption_generator.py  # Descripción visual con BLIP
 │   ├── video_uploader.py     # Grabación + subida a Backblaze
 │   ├── notificador_upc.py    # Envío de JSON al API UPC
 │   ├── global_state.py       # Eventos recientes y SSE
@@ -139,6 +142,7 @@ Accede en: [http://localhost:5000](http://localhost:5000)
 |----------------|------------------------------|
 | Web Framework   | Flask                        |
 | Speech-to-Text  | Faster-Whisper               |
+| Image-to-Text   | BLIP (Salesforce)            |
 | LLM             | Gemini Pro + LangChain       |
 | Frontend        | Bootstrap + Leaflet.js       |
 | DB              | MongoDB                      |
