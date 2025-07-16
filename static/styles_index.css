@@ -132,21 +132,21 @@
 .card-header-modern {
     background: linear-gradient(135deg, #74409B 0%, #384C81 100%);
     color: white;
-    padding: 15px 20px;
+    padding: 10px 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .card-title-modern {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     margin: 0;
     letter-spacing: 0.5px;
 }
 
 .card-body-modern {
-    padding: 20px;
+    padding: 12px;
 }
 
 /* Camera Section */
@@ -182,12 +182,12 @@
 }
 
 .status-badge {
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 11px;
+    padding: 1px 4px;
+    border-radius: 6px;
+    font-size: 9px;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.2px;
 }
 
 .status-badge.loading {
@@ -224,10 +224,6 @@
 }
 
 /* Control Card */
-.control-card {
-    
-}
-
 .btn-alert-manual {
     width: 100%;
     padding: 12px;
@@ -248,17 +244,52 @@
     box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
 }
 
+/* Manual Alert Card - Botón grande */
+.btn-alert-manual-large {
+    width: 100%;
+    padding: 20px 15px;
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-alert-manual-large:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.5);
+    background: linear-gradient(135deg, #e21e2e 0%, #d12436 100%);
+}
+
+.btn-alert-manual-large:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.alert-description {
+    font-size: 13px;
+    color: #6c757d;
+    line-height: 1.4;
+    margin: 0;
+}
+
 .device-status {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 4px;
 }
 
 .status-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 0;
+    padding: 3px 0;
     border-bottom: 1px solid #e9ecef;
 }
 
@@ -267,19 +298,20 @@
 }
 
 .device-icon {
-    font-size: 18px;
-    margin-right: 10px;
+    font-size: 12px;
+    margin-right: 6px;
 }
 
 .device-name {
     flex: 1;
     font-weight: 500;
     color: #2c3e50;
+    font-size: 12px;
 }
 
 .status-group {
     display: flex;
-    gap: 6px;
+    gap: 4px;
 }
 
 /* Alerts Card */
@@ -308,43 +340,6 @@
 .alerts-container::-webkit-scrollbar-thumb {
     background: #74409B;
     border-radius: 3px;
-}
-
-/* Transcription Card */
-.transcription-card {
-    
-}
-
-.transcription-container {
-    height: 125px;
-    overflow-y: auto;
-    background: #ffffff;
-    border-radius: 8px;
-    padding: 15px;
-    border: 1px solid #e9ecef;
-}
-
-.transcription-container::-webkit-scrollbar {
-    width: 6px;
-}
-
-.transcription-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.transcription-container::-webkit-scrollbar-thumb {
-    background: #74409B;
-    border-radius: 3px;
-}
-
-.transcription-container p {
-    margin-bottom: 8px;
-    padding: 8px 12px;
-    background: #f8f9fa;
-    border-left: 4px solid #74409B;
-    border-radius: 5px;
-    font-size: 0.9em;
 }
 
 /* Footer */

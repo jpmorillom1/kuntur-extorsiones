@@ -56,10 +56,6 @@
           <h6 class="card-title-modern">🛡️ Control del Sistema</h6>
         </div>
         <div class="card-body-modern">
-          <button class="btn-alert-manual" id="activarAlertaManual">
-            🚨 Activar alerta manual
-          </button>
-
           <!-- Estado dispositivos -->
           <div class="device-status">
             <div class="status-item">
@@ -95,15 +91,18 @@
         </div>
       </div>
 
-      <!-- Transcripción -->
-      <div class="card-modern transcription-card">
+      <!-- Alerta Manual (reemplaza transcripción) -->
+      <div class="card-modern manual-alert-card">
         <div class="card-header-modern">
-          <h6 class="card-title-modern">📝 Transcripción en Tiempo Real</h6>
+          <h6 class="card-title-modern">Activación Manual</h6>
         </div>
-        <div class="card-body-modern">
-          <div class="transcription-container output">
-            <!-- La transcripción se carga aquí dinámicamente -->
-          </div>
+        <div class="card-body-modern text-center">
+          <button class="btn-alert-manual-large" id="activarAlertaManual">
+            🚨 ACTIVAR ALERTA MANUAL
+          </button>
+          <p class="alert-description mt-3">
+            Presiona este botón si detectas una situación de emergencia que requiere atención inmediata de las autoridades.
+          </p>
         </div>
       </div>
     </div>
