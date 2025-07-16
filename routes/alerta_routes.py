@@ -82,16 +82,19 @@ def alerta_manual():
 
     coleccion_alertas.insert_one({
         "id_usuario": ObjectId(session["usuario_id"]),
+        "mensaje": "🚨 Alerta manual activada",
+        "evento_id": evento_id,
+        "texto": evento_enriquecido["texto"],                     # <- unifica nombre
+        "analisis": evento_enriquecido["analisis_ia"],            # <- unifica nombre
+        "hora": evento_enriquecido["hora"],                       # <- agrégalo si no está
+        "link_evidencia": evento_enriquecido.get("link_evidencia", "No disponible"),
+        "ip_camera": evento_enriquecido.get("ip_camara"),         # <- usa mismo nombre inglés
         "nombre_local": evento_enriquecido.get("nombre_local"),
         "ubicacion": evento_enriquecido.get("ubicacion"),
-        "ip_camara": evento_enriquecido.get("ip_camara"),
         "latitud": evento_enriquecido.get("latitud"),
         "longitud": evento_enriquecido.get("longitud"),
-        "texto_detectado": evento_enriquecido["texto"],
-        "descripcion_alerta": evento_enriquecido["analisis_ia"],
         "nivel_riesgo": riesgo,
-        "fecha": datetime.now(),
-        "link_evidencia": evento_enriquecido.get("link_evidencia", "No disponible")
+        "fecha": datetime.now()
     })
 
     notificar_a_upc(

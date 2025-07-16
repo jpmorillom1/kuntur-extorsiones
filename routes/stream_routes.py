@@ -5,22 +5,42 @@ import cv2
 import queue
 from flask import Blueprint, Response, render_template, session
 from services.global_state import event_queue, eventos_detectados
-
+from services.db import coleccion_alertas
+from bson.json_util import dumps
+import time 
+from flask import Blueprint, session, Response
+from bson.json_util import dumps
+from bson import ObjectId
+from services.db import coleccion_alertas
+import time
+from datetime import datetime
 
 stream_bp = Blueprint("stream", __name__)
 
 
 @stream_bp.route("/stream")
 def stream():
-    def event_stream():
-        while True:
-            try:
-                data = event_queue.get(timeout=30)
-                yield f"data: {json.dumps(data)}\n\n"
-            except queue.Empty:
-                yield "data: \n\n"
-    return Response(event_stream(), content_type="text/event-stream")
+    if "usuario_id" not in session:
+        return {"error": "No autorizado"}, 403
 
+    usuario_id = ObjectId(session["usuario_id"])
+
+    def event_stream():
+        last_timestamp = datetime.now()  # ⚠️ comienza desde "ahora"
+        while True:
+            # Solo buscar alertas NUEVAS desde el login
+            nuevos = list(coleccion_alertas.find({
+                "id_usuario": usuario_id,
+                "fecha": {"$gt": last_timestamp}
+            }).sort("fecha", 1).limit(10))
+
+            for alerta in nuevos:
+                last_timestamp = alerta["fecha"]  # avanzar el puntero de tiempo
+                yield f"data: {dumps(alerta)}\n\n"
+
+            time.sleep(2)
+
+    return Response(event_stream(), mimetype="text/event-stream")
 
 @stream_bp.route("/alerta/<evento_id>")
 def ver_alerta(evento_id):
