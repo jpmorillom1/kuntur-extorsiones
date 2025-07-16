@@ -38,80 +38,53 @@
 
 <!-- Contenido -->
 <div class="alert-container">
-  <div class="alert-content">
+  <div class="container-fluid">
+    <div class="row">
     <!-- Información de la Alerta -->
-    <div class="alert-info-section">
-      <div class="card-modern alert-info-card">
-        <div class="card-header-modern">
-          <h5 class="card-title-modern">🚨 Alerta Detectada</h5>
-          <div class="status-indicators">
-            <span class="status-badge danger">ACTIVA</span>
-          </div>
+    <div class="col-lg-6 mb-3">
+      <div class="card card-custom h-100">
+        <div class="card-header gradient-purple">
+          <h5 class="text-white"><i class="bi bi-exclamation-triangle-fill me-2"></i>Alerta Detectada</h5>
         </div>
-        <div class="card-body-modern">
-          <div class="alert-detail-item">
-            <div class="detail-icon">⏰</div>
-            <div class="detail-content">
-              <strong>Hora de detección:</strong>
-              <span class="detail-value">{{ evento.hora or "No disponible" }}</span>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <strong>⏰ Hora de detección:</strong><br>
+              <span class="text-muted">{{ evento.hora or "No disponible" }}</span>
+              <p><strong>📍 Local:</strong> {{ evento.nombre_local }}</p>
+              <p><strong>📌 Ubicación:</strong> {{ evento.ubicacion }}</p>
             </div>
           </div>
 
-          <div class="alert-detail-item">
-            <div class="detail-icon">📍</div>
-            <div class="detail-content">
-              <strong>Local:</strong>
-              <span class="detail-value">{{ evento.nombre_local }}</span>
-            </div>
-          </div>
-
-          <div class="alert-detail-item">
-            <div class="detail-icon">📌</div>
-            <div class="detail-content">
-              <strong>Ubicación:</strong>
-              <span class="detail-value">{{ evento.ubicacion }}</span>
-            </div>
-          </div>
-
-          <div class="alert-detail-item">
-            <div class="detail-icon">📝</div>
-            <div class="detail-content">
-              <strong>Texto detectado:</strong>
-              <div class="alert-text-detected">
-                {% if evento.analisis_ia %}
-                  {{ evento.analisis_ia }}
-                {% else %}
-                  {{ evento.texto }}
-                {% endif %}
-              </div>
+          <div class="mb-3">
+            <strong>📝 Texto detectado:</strong>
+            <div class="alert alert-warning mt-2">
+              {% if evento.analisis_ia %}
+                {{ evento.analisis_ia }}
+              {% else %}
+                {{ evento.texto }}
+              {% endif %}
             </div>
           </div>
 
           {% if evento.link_evidencia %}
-          <div class="alert-detail-item">
-            <div class="detail-icon">🎥</div>
-            <div class="detail-content">
-              <strong>Evidencia:</strong>
-              <a href="{{ evento.link_evidencia }}" target="_blank" class="btn-evidence">
-                Ver evidencia grabada
-              </a>
-            </div>
+          <div class="mb-3">
+            <a href="{{ evento.link_evidencia }}" target="_blank" class="btn btn-outline-primary">
+              🎥 Ver evidencia grabada
+            </a>
           </div>
           {% endif %}
 
-          <div class="alert-detail-item">
-            <div class="detail-icon">🗺️</div>
-            <div class="detail-content">
-              <strong>Ubicación en el Mapa:</strong>
-              <div id="mapa-ubicacion" class="map-container"
-                   data-lat="{{ evento.latitud }}"
-                   data-lng="{{ evento.longitud }}"
-                   data-nombre="{{ evento.nombre_local }}"
-                   data-direccion="{{ evento.ubicacion }}">
-              </div>
-              <div class="coordinates-info">
-                Coordenadas: {{ evento.latitud }}, {{ evento.longitud }}
-              </div>
+          <div class="mb-3">
+            <strong>🗺️ Ubicación en el Mapa:</strong>
+            <div id="mapa-ubicacion" class="mt-2"
+                 data-lat="{{ evento.latitud }}"
+                 data-lng="{{ evento.longitud }}"
+                 data-nombre="{{ evento.nombre_local }}"
+                 data-direccion="{{ evento.ubicacion }}">
+            </div>
+            <div class="text-muted mt-2 small">
+              Coordenadas: {{ evento.latitud }}, {{ evento.longitud }}
             </div>
           </div>
         </div>
@@ -119,21 +92,19 @@
     </div>
 
     <!-- Cámara en vivo -->
-    <div class="camera-live-section">
-      <div class="card-modern camera-live-card">
-        <div class="card-header-modern">
-          <h5 class="card-title-modern">📹 Transmisión en Vivo</h5>
-          <div class="status-indicators">
-            <span class="status-badge success">EN VIVO</span>
-          </div>
+    <div class="col-lg-6 mb-3">
+      <div class="card card-custom">
+        <div class="card-header gradient-purple">
+          <h5 class="text-white"><i class="bi bi-camera-video me-2"></i>Transmisión en Vivo</h5>
         </div>
-        <div class="card-body-modern camera-live-container">
-          <img id="ip-camera" src="{{ evento.ip_camara }}" alt="Transmisión en vivo no disponible" class="camera-live-feed">
+        <div class="card-body d-flex justify-content-center align-items-center p-2" style="min-height: auto;">
+          <img id="ip-camera" src="{{ evento.ip_camara }}" alt="Transmisión en vivo no disponible" class="img-fluid" style="max-width: 100%; height: auto; display: block;">
         </div>
-        <div class="card-footer-modern">
-          <small class="connection-status">📡 Conexión en tiempo real</small>
+        <div class="card-footer text-center">
+          <small class="text-muted">📡 Conexión en tiempo real</small>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </div>
