@@ -58,7 +58,9 @@ def transcribe():
         "nivel_riesgo": "MEDIO",
         "analisis": "Procesando...",
         "link_evidencia": "Procesando...",
-        "descripcion_visual": "Procesando..."
+        "descripcion_visual": "Procesando...",
+        "parte_policial": "standby",  
+        "sentencia": "standby"  
     }
 
     coleccion_alertas.insert_one(documento_inicial)
@@ -124,7 +126,9 @@ def transcribe():
         descripcion=descripcion_ia,
         ubicacion=documento_inicial["ubicacion"],
         ip_camara=documento_inicial["ip_camara"],
-        url_evidencia=link_video
+        url_evidencia=link_video,
+        id_usuario=session["usuario_id"],
+        id_alerta= evento_id        
     )
 
     return {"output": texto}

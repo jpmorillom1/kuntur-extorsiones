@@ -10,7 +10,13 @@ from services.video_uploader import grabar_y_subir_video
 from services.db import coleccion_alertas
 from services.global_state import event_queue, eventos_detectados
 from services.notificador_upc import notificar_a_upc
+from flask import render_template, session
+from flask import request, jsonify
+
+
 alerta_bp = Blueprint("alerta", __name__)
+
+
 
 @alerta_bp.route("/alerta_manual", methods=["POST"])
 def alerta_manual():
@@ -37,7 +43,10 @@ def alerta_manual():
         "descripcion_visual": "En proceso...",
         "link_evidencia": "Procesando...",
         "nivel_riesgo": "En análisis",
-        "fecha": datetime.now()
+        "fecha": datetime.now(),
+        "parte_policial": "standby",  
+        "sentencia": "standby"  
+        
     }
 
     resultado = coleccion_alertas.insert_one(evento_basico)
@@ -123,7 +132,50 @@ def alerta_manual():
         descripcion=analisis_ia,
         ubicacion=evento_basico["ubicacion"],
         ip_camara=evento_basico["ip_camera"],
-        url_evidencia=link_video
+        url_evidencia=link_video,
+        id_usuario=session["usuario_id"],
+        id_alerta=alerta_id
     )
 
+    
+
     return {"status": "ok", "evento_id": evento_id}
+
+
+
+
+@alerta_bp.route("/mis_alertas")
+def mis_alertas():
+    if "usuario_id" not in session:
+        return {"error": "No autorizado"}, 403
+
+    usuario_id = ObjectId(session["usuario_id"])
+    alertas = list(coleccion_alertas.find({"id_usuario": usuario_id}).sort("fecha", -1))
+
+
+    return render_template("mis_alertas.html", alertas=alertas)
+
+
+@alerta_bp.route("/actualizar_alerta_externa", methods=["POST"])
+
+def actualizar_alerta_externa():
+    data = request.get_json()
+    try:
+        alerta_id = ObjectId(data["evento_id"])  # 👈 convertir a ObjectId
+    except Exception as e:
+        return {"error": "ID de alerta inválido"}, 400
+
+    result = coleccion_alertas.update_one(
+        {"_id": alerta_id},
+        {
+            "$set": {
+                "parte_policial": data.get("parte_policial"),
+                "sentencia": data.get("sentencia")
+            }
+        }
+    )
+
+    if result.matched_count == 0:
+        return {"error": "Alerta no encontrada"}, 404
+
+    return {"status": "ok", "mensaje": "Alerta actualizada correctamente"}

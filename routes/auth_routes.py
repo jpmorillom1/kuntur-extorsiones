@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, session
 from bson import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 from services.db import coleccion_usuarios
+from services.db import coleccion_alertas
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -68,3 +69,5 @@ def panel():
         nombre_local=usuario["nombre_local"],
         ubicacion=usuario["ubicacion"],
     )
+
+
