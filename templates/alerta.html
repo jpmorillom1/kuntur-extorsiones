@@ -60,8 +60,8 @@
           <div class="mb-3">
             <strong>📝 Texto detectado:</strong>
             <div id="analisis-ia" class="alert alert-warning mt-2">
-              {% if evento.analisis_ia %}
-                {{ evento.analisis_ia }}
+              {% if evento.analisis %}
+                {{ evento.analisis }}
               {% else %}
                 {{ evento.texto }}
               {% endif %}
