@@ -14,7 +14,14 @@ def grabar_y_subir_video(camera_ip_url, bucket_name, key_id, app_key):
     fps = 20
     segundos = 5
     total_frames = fps * segundos
-    frame_medio_idx = total_frames // 2
+
+    # Capturar frames al 25%, 50% y 75% del video
+    idxs_para_describir = [
+        total_frames // 4,
+        total_frames // 2,
+        (3 * total_frames) // 4
+    ]
+    frames_descriptivos = {}
 
     video_buffer = io.BytesIO()
     writer = imageio.get_writer(video_buffer, format='mp4', fps=fps, macro_block_size=None)
@@ -22,7 +29,6 @@ def grabar_y_subir_video(camera_ip_url, bucket_name, key_id, app_key):
     descripcion_visual = "No disponible"
     try:
         frames_grabados = 0
-        frame_para_describir = None
 
         while frames_grabados < total_frames:
             ret, frame = cap.read()
@@ -30,15 +36,24 @@ def grabar_y_subir_video(camera_ip_url, bucket_name, key_id, app_key):
                 time.sleep(0.05)
                 continue
 
-            if frames_grabados == frame_medio_idx:
-                frame_para_describir = frame.copy()
+            # Guardar los frames clave
+            if frames_grabados in idxs_para_describir:
+                frames_descriptivos[frames_grabados] = frame.copy()
 
             writer.append_data(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
             frames_grabados += 1
 
-        # Generar caption si se capturó el frame del medio
-        if frame_para_describir is not None:
-            descripcion_visual = generar_descripcion(frame_para_describir)
+        # Generar descripciones si se capturaron los 3 frames
+        captions = []
+        for idx in sorted(frames_descriptivos.keys()):
+            try:
+                descripcion = generar_descripcion(frames_descriptivos[idx])
+                captions.append(f"Frame {idx}: {descripcion}")
+            except Exception as e:
+                print(f"❌ Error generando descripción para frame {idx}: {e}")
+
+        if captions:
+            descripcion_visual = " | ".join(captions)
 
     finally:
         cap.release()
