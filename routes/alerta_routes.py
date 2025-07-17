@@ -18,21 +18,44 @@ def alerta_manual():
         return {"error": "No autorizado"}, 403
 
     evento_id = str(uuid.uuid4())
+    hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     texto_simulado = "Se reporta una amenaza directa en el lugar. El usuario ha activado una alerta manualmente."
 
-    evento = {
-        "id": evento_id,
+    evento_basico = {
+        "id_usuario": ObjectId(session["usuario_id"]),
+        "mensaje": "🚨 Alerta manual activada",
+        "evento_id": evento_id,
         "texto": texto_simulado,
-        "hora": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "manual": True,
+        "hora": hora_actual,
+        "ip_camera": session.get("ip_camara"),
         "nombre_local": session.get("nombre_local"),
         "ubicacion": session.get("ubicacion"),
-        "ip_camara": session.get("ip_camara"),
         "latitud": session.get("latitud"),
-        "longitud": session.get("longitud")
+        "longitud": session.get("longitud"),
+        "analisis": "En proceso...",
+        "descripcion_visual": "En proceso...",
+        "link_evidencia": "Procesando...",
+        "nivel_riesgo": "En análisis",
+        "fecha": datetime.now()
     }
 
-    # 2. Captura video y descripción visual
+    resultado = coleccion_alertas.insert_one(evento_basico)
+    alerta_id = resultado.inserted_id
+
+    # Enviar SSE inmediatamente
+    event_queue.put({
+        "mensaje": evento_basico["mensaje"],
+        "evento_id": evento_id,
+        "texto": texto_simulado,
+        "hora": hora_actual,
+        "ip_camera": evento_basico["ip_camera"],
+        "nombre_local": evento_basico["nombre_local"],
+        "ubicacion": evento_basico["ubicacion"],
+        "latitud": evento_basico["latitud"],
+        "longitud": evento_basico["longitud"]
+    })
+
+    # Procesamiento en segundo plano
     try:
         link_video, descripcion_visual = grabar_y_subir_video(
             session["ip_camara"],
@@ -40,71 +63,66 @@ def alerta_manual():
             key_id=os.getenv("B2_KEY_ID"),
             app_key=os.getenv("B2_APP_KEY")
         )
-        evento["link_evidencia"] = link_video
-        evento["descripcion_visual"] = descripcion_visual
     except Exception as e:
         print(f"⚠️ Error subiendo video o generando descripción visual: {e}")
-        evento["link_evidencia"] = "No disponible"
-        evento["descripcion_visual"] = "No disponible"
+        link_video = "No disponible"
+        descripcion_visual = "No disponible"
 
-    # 3. Procesar evento con IA
     try:
-        evento_enriquecido = procesar_evento_con_ia(evento)
+        evento_enriquecido = procesar_evento_con_ia({
+            "id": evento_id,
+            "texto": texto_simulado,
+            "hora": hora_actual,
+            "nombre_local": session.get("nombre_local"),
+            "ubicacion": session.get("ubicacion"),
+            "ip_camara": session.get("ip_camara"),
+            "latitud": session.get("latitud"),
+            "longitud": session.get("longitud"),
+            "descripcion_visual": descripcion_visual
+        })
+        analisis_ia = evento_enriquecido.get("analisis_ia", "No disponible")
     except Exception as e:
         print(f"❌ Error IA manual: {e}")
-        evento_enriquecido = evento
-        evento_enriquecido["analisis_ia"] = "No disponible"
-    eventos_detectados.append(evento_enriquecido)
-   
-    event_queue.put({
-        "mensaje": "🚨 Alerta manual activada",
-        "evento_id": evento_id,
-        "texto": evento_enriquecido["texto"],
-        "link_evidencia": evento_enriquecido.get("link_evidencia", ""),
-        "ip_camera": evento_enriquecido.get("ip_camara"),
-        "analisis": evento_enriquecido.get("analisis_ia", "Sin análisis"),
-        "hora": evento_enriquecido["hora"],
-        "nombre_local": evento_enriquecido.get("nombre_local"),
-        "ubicacion": evento_enriquecido.get("ubicacion"),
-        "latitud": evento_enriquecido.get("latitud"),
-        "longitud": evento_enriquecido.get("longitud")
-    })
+        analisis_ia = "No disponible"
 
-    print("====================")
-    print(evento_enriquecido)
-    print("====================")
-
+    # Determinar nivel de riesgo
     riesgo = "MEDIO"
     for nivel in ["CRÍTICO", "ALTO", "MEDIO", "BAJO"]:
-        if nivel.lower() in evento_enriquecido["analisis_ia"].lower():
+        if nivel.lower() in analisis_ia.lower():
             riesgo = nivel
             break
 
-    coleccion_alertas.insert_one({
-        "id_usuario": ObjectId(session["usuario_id"]),
-        "mensaje": "🚨 Alerta manual activada",
-        "evento_id": evento_id,
-        "texto": evento_enriquecido["texto"],                     # <- unifica nombre
-        "analisis": evento_enriquecido["analisis_ia"],            # <- unifica nombre
-        "hora": evento_enriquecido["hora"],                       # <- agrégalo si no está
-        "link_evidencia": evento_enriquecido.get("link_evidencia", "No disponible"),
-        "ip_camera": evento_enriquecido.get("ip_camara"),         # <- usa mismo nombre inglés
-        "nombre_local": evento_enriquecido.get("nombre_local"),
-        "ubicacion": evento_enriquecido.get("ubicacion"),
-        "latitud": evento_enriquecido.get("latitud"),
-        "longitud": evento_enriquecido.get("longitud"),
-        "nivel_riesgo": riesgo,
-        "fecha": datetime.now()
-    })
-
-    notificar_a_upc(
-        descripcion=evento_enriquecido["analisis_ia"],
-        ubicacion=evento_enriquecido["ubicacion"],
-        ip_camara=evento_enriquecido["ip_camara"],
-        url_evidencia=evento_enriquecido.get("link_evidencia")
+    # Actualizar documento en MongoDB
+    coleccion_alertas.update_one(
+        {"_id": alerta_id},
+        {"$set": {
+            "analisis": analisis_ia,
+            "descripcion_visual": descripcion_visual,
+            "link_evidencia": link_video,
+            "nivel_riesgo": riesgo
+        }}
     )
 
+    # Guardar en memoria
+    eventos_detectados.append({
+        "id": evento_id,
+        "texto": texto_simulado,
+        "hora": hora_actual,
+        "analisis_ia": analisis_ia,
+        "ip_camara": session.get("ip_camara"),
+        "nombre_local": session.get("nombre_local"),
+        "ubicacion": session.get("ubicacion"),
+        "latitud": session.get("latitud"),
+        "longitud": session.get("longitud"),
+        "link_evidencia": link_video
+    })
 
-
+    # Notificación externa
+    notificar_a_upc(
+        descripcion=analisis_ia,
+        ubicacion=evento_basico["ubicacion"],
+        ip_camara=evento_basico["ip_camera"],
+        url_evidencia=link_video
+    )
 
     return {"status": "ok", "evento_id": evento_id}

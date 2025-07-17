@@ -33,13 +33,13 @@ if (navigator.mediaDevices.getUserMedia) {
 
                 setTimeout(() => {
                     mediaRecorder.stop();
-                }, 5000); // 5 segundos
+                }, 10000); // 5 segundos
             }
         }
    
 
         // Repetir grabación cada 5 segundos
-        setInterval(recordFor5Seconds, 5000);
+        setInterval(recordFor5Seconds, 10000);
 
     }).catch(function (err) {
         alert("Error al acceder al micrófono: " + err);

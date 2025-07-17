@@ -18,6 +18,8 @@ from datetime import datetime
 stream_bp = Blueprint("stream", __name__)
 
 
+
+
 @stream_bp.route("/stream")
 def stream():
     if "usuario_id" not in session:
@@ -30,7 +32,7 @@ def stream():
         while True:
             # Solo buscar alertas NUEVAS desde el login
             nuevos = list(coleccion_alertas.find({
-                "id_usuario": usuario_id,
+                
                 "fecha": {"$gt": last_timestamp}
             }).sort("fecha", 1).limit(10))
 
@@ -44,7 +46,9 @@ def stream():
 
 @stream_bp.route("/alerta/<evento_id>")
 def ver_alerta(evento_id):
-    evento = next((e for e in eventos_detectados if e["id"] == evento_id), None)
+    from bson import ObjectId
+
+    evento = coleccion_alertas.find_one({"evento_id": evento_id})
     if not evento:
         return "Evento no encontrado", 404
 
@@ -57,7 +61,6 @@ def ver_alerta(evento_id):
         latitud=evento.get("latitud"),
         longitud=evento.get("longitud")
     )
-
 
 @stream_bp.route("/video_feed")
 def video_feed():
@@ -94,4 +97,22 @@ def generar_frames(ip_camara):
         ret, buffer = cv2.imencode('.jpg', frame)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+
+
+
+@stream_bp.route("/stream_alerta/<evento_id>")
+def stream_alerta(evento_id):
+    def evento_stream():
+        from bson import ObjectId
+        last_updated = datetime.now()
+        while True:
+            alerta = coleccion_alertas.find_one({
+                "evento_id": evento_id,
+                "fecha": {"$gt": last_updated}
+            })
+            if alerta:
+                last_updated = alerta["fecha"]
+                yield f"data: {dumps(alerta)}\n\n"
+            time.sleep(2)
+    return Response(evento_stream(), mimetype="text/event-stream")
 

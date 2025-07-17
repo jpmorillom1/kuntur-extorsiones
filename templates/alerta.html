@@ -40,6 +40,7 @@
 <div class="alert-container">
   <div class="container-fluid">
     <div class="row">
+
     <!-- Información de la Alerta -->
     <div class="col-lg-6 mb-3">
       <div class="card card-custom h-100">
@@ -58,7 +59,7 @@
 
           <div class="mb-3">
             <strong>📝 Texto detectado:</strong>
-            <div class="alert alert-warning mt-2">
+            <div id="analisis-ia" class="alert alert-warning mt-2">
               {% if evento.analisis_ia %}
                 {{ evento.analisis_ia }}
               {% else %}
@@ -69,7 +70,7 @@
 
           {% if evento.link_evidencia %}
           <div class="mb-3">
-            <a href="{{ evento.link_evidencia }}" target="_blank" class="btn btn-outline-primary">
+            <a id="btn-evidencia" href="{{ evento.link_evidencia }}" target="_blank" class="btn btn-outline-primary">
               🎥 Ver evidencia grabada
             </a>
           </div>
@@ -105,6 +106,7 @@
         </div>
       </div>
     </div>
+
     </div>
   </div>
 </div>
@@ -122,6 +124,7 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
 <script src="{{ url_for('static', filename='mapa_alerta.js') }}"></script>
+<script src="{{ url_for('static', filename='alerta_sse.js') }}"></script>
 
 </body>
 </html>

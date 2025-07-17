@@ -3,23 +3,18 @@
 import io
 import os
 import uuid
-import json
 from datetime import datetime
-from flask import Blueprint, request, session, Response, render_template
+from flask import Blueprint, request, session
 from bson import ObjectId
 from faster_whisper import WhisperModel
-
 from services.threat_detector import es_texto_amenaza
 from services.gemini_analyzer import procesar_evento_con_ia
 from services.video_uploader import grabar_y_subir_video
 from services.db import coleccion_alertas
-from services.global_state import  event_queue, eventos_detectados
 from services.notificador_upc import notificar_a_upc
 
 transcribe_bp = Blueprint("transcribe", __name__)
 whisper_model = WhisperModel("base", device="cpu", compute_type="int8")
-
-
 
 @transcribe_bp.route("/transcribe", methods=["POST"])
 def transcribe():
@@ -29,6 +24,7 @@ def transcribe():
     file = request.files["audio"]
     buffer = io.BytesIO(file.read())
     temp_path = "temp_audio.webm"
+
     with open(temp_path, "wb") as f:
         f.write(buffer.getbuffer())
 
@@ -41,90 +37,91 @@ def transcribe():
 
     texto = " ".join(segment.text for segment in segments)
 
-    if es_texto_amenaza(texto):
-        evento_id = str(uuid.uuid4())
+    if not es_texto_amenaza(texto):
+        return {"output": texto}
+
+    evento_id = str(uuid.uuid4())
+    ahora = datetime.now()
+    documento_inicial = {
+        "id_usuario": ObjectId(session["usuario_id"]),
+        "mensaje": "🚨 Alerta crítica detectada",
+        "evento_id": evento_id,
+        "texto_detectado": texto,
+        "hora": ahora.strftime("%Y-%m-%d %H:%M:%S"),
+        "fecha": ahora,
+        "nombre_local": session.get("nombre_local"),
+        "ubicacion": session.get("ubicacion"),
+        "ip_camara": session.get("ip_camara"),
+        "latitud": session.get("latitud"),
+        "longitud": session.get("longitud"),
+        "nivel_riesgo": "MEDIO",
+        "analisis": "Procesando...",
+        "link_evidencia": "Procesando...",
+        "descripcion_visual": "Procesando..."
+    }
+
+    coleccion_alertas.insert_one(documento_inicial)
+
+    # Ahora obtener ID de Mongo
+    doc_mongo = coleccion_alertas.find_one({"evento_id": evento_id})
+
+    # Capturar video y descripción visual
+    try:
+        link_video, descripcion_visual = grabar_y_subir_video(
+            session["ip_camara"],
+            bucket_name="kuntur-extorsiones",
+            key_id=os.getenv("B2_KEY_ID"),
+            app_key=os.getenv("B2_APP_KEY")
+        )
+    except Exception as e:
+        print(f"⚠️ Error subiendo video o generando descripción visual: {e}")
+        link_video = "No disponible"
+        descripcion_visual = "No disponible"
+
+    # Analizar con IA
+    try:
         evento = {
             "id": evento_id,
             "texto": texto,
-            "hora": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "nombre_local": session.get("nombre_local"),
-            "ubicacion": session.get("ubicacion"),
-            "ip_camara": session.get("ip_camara"),
-            "latitud": session.get("latitud"),
-            "longitud": session.get("longitud")
+            "hora": documento_inicial["hora"],
+            "nombre_local": documento_inicial["nombre_local"],
+            "ubicacion": documento_inicial["ubicacion"],
+            "ip_camara": documento_inicial["ip_camara"],
+            "latitud": documento_inicial["latitud"],
+            "longitud": documento_inicial["longitud"],
+            "descripcion_visual": descripcion_visual,
+            "link_evidencia": link_video
         }
+        analisis = procesar_evento_con_ia(evento)
+        descripcion_ia = analisis["analisis_ia"]
+    except Exception as e:
+        print(f"❌ Error IA: {e}")
+        descripcion_ia = "No disponible"
 
-        # Captura de video y descripción visual
-        try:
-            link_video, descripcion_visual = grabar_y_subir_video(
-                session["ip_camara"],
-                bucket_name="kuntur-extorsiones",
-                key_id=os.getenv("B2_KEY_ID"),
-                app_key=os.getenv("B2_APP_KEY")
-            )
-            evento["link_evidencia"] = link_video
-            evento["descripcion_visual"] = descripcion_visual
-        except Exception as e:
-            print(f"⚠️ Error subiendo video o generando descripción visual: {e}")
-            evento["link_evidencia"] = "No disponible"
-            evento["descripcion_visual"] = "No disponible"
+    # Nivel de riesgo
+    riesgo = "MEDIO"
+    for nivel in ["CRÍTICO", "ALTO", "MEDIO", "BAJO"]:
+        if nivel.lower() in descripcion_ia.lower():
+            riesgo = nivel
+            break
 
-        # Enviar a IA con texto + descripción visual
-        try:
-            evento_enriquecido = procesar_evento_con_ia(evento)
-        except Exception as e:
-            print(f"❌ Error IA: {e}")
-            evento_enriquecido = evento
-            evento_enriquecido["analisis_ia"] = "No disponible"
+    # Actualizar documento
+    coleccion_alertas.update_one(
+        {"_id": doc_mongo["_id"]},
+        {"$set": {
+            "analisis": descripcion_ia,
+            "link_evidencia": link_video,
+            "descripcion_visual": descripcion_visual,
+            "nivel_riesgo": riesgo
+        }}
+    )
 
-        eventos_detectados.append(evento_enriquecido)
-
-        # Notificación SSE
-        event_queue.put({
-            "mensaje": "🚨 Alerta crítica detectada",
-            "evento_id": evento_id,
-            "texto": evento_enriquecido["texto"],
-            "link_evidencia": evento_enriquecido.get("link_evidencia", ""),
-            "ip_camera": evento_enriquecido.get("ip_camara"),
-            "analisis": evento_enriquecido.get("analisis_ia", "Sin análisis"),
-            "hora": evento_enriquecido["hora"],
-            "nombre_local": evento_enriquecido.get("nombre_local"),
-            "ubicacion": evento_enriquecido.get("ubicacion"),
-            "latitud": evento_enriquecido.get("latitud"),
-            "longitud": evento_enriquecido.get("longitud")
-        })
-
-        # Guardar en MongoDB
-        riesgo = "MEDIO"
-        for nivel in ["CRÍTICO", "ALTO", "MEDIO", "BAJO"]:
-            if nivel.lower() in evento_enriquecido["analisis_ia"].lower():
-                riesgo = nivel
-                break
-
-        coleccion_alertas.insert_one({
-            "id_usuario": ObjectId(session["usuario_id"]),
-            "mensaje": "🚨 Alerta crítica detectada",
-            "evento_id": evento_id,
-            "texto": evento_enriquecido["texto"],
-            "analisis": evento_enriquecido["analisis_ia"],
-            "hora": evento_enriquecido["hora"],
-            "link_evidencia": evento_enriquecido.get("link_evidencia", "No disponible"),
-            "ip_camera": evento_enriquecido.get("ip_camara"),
-            "nombre_local": evento_enriquecido.get("nombre_local"),
-            "ubicacion": evento_enriquecido.get("ubicacion"),
-            "latitud": evento_enriquecido.get("latitud"),
-            "longitud": evento_enriquecido.get("longitud"),
-            "descripcion_visual": evento_enriquecido.get("descripcion_visual", "No disponible"),
-            "nivel_riesgo": riesgo,
-            "fecha": datetime.now()
-        })
-
-        notificar_a_upc(
-            descripcion=evento_enriquecido["analisis_ia"],
-            ubicacion=evento_enriquecido["ubicacion"],
-            ip_camara=evento_enriquecido["ip_camara"],
-            url_evidencia=evento_enriquecido.get("link_evidencia")
-        )
+    # Notificar UPC
+    notificar_a_upc(
+        descripcion=descripcion_ia,
+        ubicacion=documento_inicial["ubicacion"],
+        ip_camara=documento_inicial["ip_camara"],
+        url_evidencia=link_video
+    )
 
     return {"output": texto}
-
