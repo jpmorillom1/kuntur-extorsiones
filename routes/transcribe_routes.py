@@ -46,6 +46,7 @@ def transcribe():
         "id_usuario": ObjectId(session["usuario_id"]),
         "mensaje": "🚨 Alerta crítica detectada",
         "evento_id": evento_id,
+        "texto": texto,
         "texto_detectado": texto,
         "hora": ahora.strftime("%Y-%m-%d %H:%M:%S"),
         "fecha": ahora,
@@ -115,6 +116,8 @@ def transcribe():
             "nivel_riesgo": riesgo
         }}
     )
+
+    
 
     # Notificar UPC
     notificar_a_upc(
