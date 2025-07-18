@@ -127,8 +127,7 @@ def transcribe():
         ubicacion=documento_inicial["ubicacion"],
         ip_camara=documento_inicial["ip_camara"],
         url_evidencia=link_video,
-        id_usuario=session["usuario_id"],
-        id_alerta= evento_id        
+    
     )
 
     return {"output": texto}

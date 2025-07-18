@@ -133,8 +133,7 @@ def alerta_manual():
         ubicacion=evento_basico["ubicacion"],
         ip_camara=evento_basico["ip_camera"],
         url_evidencia=link_video,
-        id_usuario=session["usuario_id"],
-        id_alerta=alerta_id
+
     )
 
     
@@ -154,6 +153,7 @@ def mis_alertas():
 
 
     return render_template("mis_alertas.html", alertas=alertas)
+
 
 
 @alerta_bp.route("/actualizar_alerta_externa", methods=["POST"])

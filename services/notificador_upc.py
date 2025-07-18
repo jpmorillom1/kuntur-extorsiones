@@ -1,31 +1,27 @@
 import requests
 
+def notificar_a_upc(descripcion, ubicacion, ip_camara=None, url_evidencia=None):
+    url = "https://upc-kuntur.onrender.com/denuncia"
 
-def notificar_a_upc(descripcion, ubicacion, ip_camara, url_evidencia=None, id_usuario=None, id_alerta=None):
-    payload = {
+    data = {
         "descripcion": descripcion,
         "ubicacion": ubicacion,
-        "ip_camara": ip_camara,
-        "id_usuario": str(id_usuario) if id_usuario else None,
-        "id_alerta": str(id_alerta) if id_alerta else None
     }
 
     if url_evidencia:
-        payload["url"] = url_evidencia
+        data["url"] = url_evidencia
+
+    if ip_camara:
+        data["url_stream"] = ip_camara
 
     try:
-        respuesta = requests.post(
-            "http://localhost:8000/api/denuncias",
-            json=payload,
-            timeout=10
-        )
-
+        response = requests.post(url, data=data, timeout=10)
         print("===================")
-        print(payload)
+        print("Payload:", data)
+        print("Código de respuesta:", response.status_code)
+        print("Respuesta:", response.text)
         print("===================")
-        print(f"✅ Notificación enviada a UPC. Código: {respuesta.status_code}")
-        return respuesta.status_code == 200
-
+        return response.status_code == 200
     except Exception as e:
         print(f"❌ Error notificando a UPC: {e}")
         return False
