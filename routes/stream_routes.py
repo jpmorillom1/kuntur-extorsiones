@@ -104,15 +104,17 @@ def generar_frames(ip_camara):
 def stream_alerta(evento_id):
     def evento_stream():
         from bson import ObjectId
-        last_updated = datetime.now()
+        last_hash = None
         while True:
-            alerta = coleccion_alertas.find_one({
-                "evento_id": evento_id,
-                "fecha": {"$gt": last_updated}
-            })
+            alerta = coleccion_alertas.find_one({"evento_id": evento_id})
             if alerta:
-                last_updated = alerta["fecha"]
-                yield f"data: {dumps(alerta)}\n\n"
+                # Crear un hash simple del contenido para detectar cambios
+                current_hash = hash(dumps({
+                    "analisis": alerta.get("analisis"),
+                    "link_evidencia": alerta.get("link_evidencia")
+                }))
+                if current_hash != last_hash:
+                    last_hash = current_hash
+                    yield f"data: {dumps(alerta)}\n\n"
             time.sleep(2)
     return Response(evento_stream(), mimetype="text/event-stream")
-
