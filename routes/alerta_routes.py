@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from flask import Blueprint, session, request
 from bson import ObjectId
-from services.gemini_analyzer import procesar_evento_con_ia
+from services.ollama_analyzer import procesar_evento_con_ia
 from services.video_uploader import grabar_y_subir_video
 from services.db import coleccion_alertas
 from services.global_state import event_queue, eventos_detectados

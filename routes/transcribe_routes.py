@@ -8,7 +8,7 @@ from flask import Blueprint, request, session
 from bson import ObjectId
 from faster_whisper import WhisperModel
 from services.threat_detector import es_texto_amenaza
-from services.gemini_analyzer import procesar_evento_con_ia
+from services.ollama_analyzer import procesar_evento_con_ia
 from services.video_uploader import grabar_y_subir_video
 from services.db import coleccion_alertas
 from services.notificador_upc import notificar_a_upc
